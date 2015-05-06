@@ -1,0 +1,29 @@
+{
+  "family": "BruceCham",
+  "name": "FormValidator",
+  "version": "1.0.0",
+  "description": "a module for form by zepto",
+  "homepage": "https://github.com/brucecham/FormValidator",
+  "author": "brucecham",
+  "maintainers": [
+    "brucecham"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brucecham/FormValidator.git"
+  },
+  "bugs": {
+    "url": ""
+  },
+  "keywords": [],
+  "licenses": "MIT",
+  "spm": {
+    "output": [
+      "FormValidator.js",
+      "FormValidator.css"
+    ],
+    "alias": {},
+    "devAlias": {},
+    "engines": {}
+  }
+}
