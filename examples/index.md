@@ -26,6 +26,7 @@
     font-size: .75rem;
     margin-top: .3125rem
 }
+````
 ````html
     <form id="infoverifyForm" action="ui-form_submit" method="get">
         <div class="control-group">
@@ -66,7 +67,7 @@
             <button type="submit" class="btn">点击提交</button>
         </div>
     </form>
-
+````
 ````javascript
 seajs.use('FormValidator', function(FormValidator) {
 	    var validator = new FormValidator('#infoverifyForm',{
