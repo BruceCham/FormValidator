@@ -1,12 +1,10 @@
 define(function(require, exports, module) {
     "use strict";
     //使用严格模式
-    var namespace = "hbeclibFormValidator";
+    var namespace = "BClibFormValidator";
     var type = [ 'input:not([type]),input[type="color"],input[type="date"],input[type="datetime"],input[type="datetime-local"],input[type="email"],input[type="file"],input[type="hidden"],input[type="month"],input[type="number"],input[type="password"],input[type="range"],input[type="search"],input[type="tel"],input[type="text"],input[type="time"],input[type="url"],input[type="week"],textarea', "select", 'input[type="checkbox"],input[type="radio"]' ], allTypes = type.join(",");
     var defaults = {
-        //预留功能,是否ajax方式提交表单(未实现)
-        isAjax: false,
-        //默认提交是否验证
+        //默认提交是否验证 false ajax方式提交表单 表单结果从result()取值
         onSubmit: true,
         //全局默认onblur时是否验证
         onBlur: true,
@@ -106,8 +104,8 @@ define(function(require, exports, module) {
         minvalue: "最小值不能超过value",
         maxvalue: "最大值不能超过value",
         regex: "请输入正确的值",
-        email: "请输入正确的邮箱格式,如:hbec@touker.com.cn",
-        url: "请输入正确的url地址,如:http://www.touker.com",
+        email: "请输入正确的邮箱格式,如:BC@github.com.cn",
+        url: "请输入正确的url地址,如:http://www.github.com",
         equals: "输入值必须等于 :value",
         ip: "请输入正确的ip地址格式,如:10.1.1.1",
         phone: "请输入正确的电话号码,如:18688888888",
@@ -258,6 +256,18 @@ define(function(require, exports, module) {
                     $field.data("id", id);
                 }
             });
+        },
+        result: function(){
+            var validator = this;
+            if (!$.isEmptyObject(validator.errors)) {
+                return false;
+            }
+            validator.validate();
+            if (!$.isEmptyObject(validator.errors)) {
+                return false;
+            } else {
+                return true;
+            }
         },
         launched: function() {
             var validator = this, checkOnSubmit = validator.options.onSubmit, checkOnBlur = validator.options.onBlur, checkOnChange = validator.options.onChange, checkOnKeyup = validator.options.onKeyup ,checkOnInput = validator.options.onInput;
