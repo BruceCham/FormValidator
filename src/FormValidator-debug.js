@@ -1,3 +1,27 @@
+/*
+//表单验证 引用
+var validator = new FormValidator('#orderForm',{
+    //验证的input框name
+    inputs:["transactionPassword"],
+    //对应的验证规则
+    rules: {
+        transactionPassword: "required|maxlength:6|digit"
+    },
+    //验证的提示信息
+    messages: {
+        transactionPassword:{
+            required: "交易密码不能为空",
+            maxlength : "交易密码为6位数字密码",
+            digit:"交易密码只能是数字"
+        }
+    }
+});
+//表单验证 初始化
+validator.launched();
+
+*/
+
+
 define(function(require, exports, module) {
     "use strict";
     //使用严格模式
@@ -121,6 +145,11 @@ define(function(require, exports, module) {
         //public
         this.form = $form;
         this.options = $.extend({}, defaults, options);
+        this.inputs = this.options.inputs;
+        for(var i=0;i<this.inputs.length;i++){
+            this.inputs[i] = "[name=" + this.inputs[i] + "]";
+        }
+        this.inputs = this.inputs.toString();
         this.methods = $.extend({}, methods);
         this.fields = $form.find(allTypes);
         this.allowed_rules = [];
@@ -135,7 +164,8 @@ define(function(require, exports, module) {
     $.extend(Validator.prototype, {
         validate: function() {
             var validator = this;
-            validator.fields.filter(type[0]).each(function() {
+            // validator.fields.filter(type[0]).each(function() {
+            validator.fields.filter(validator.inputs).each(function() {
                 var $field = $(this);
                 $field.trigger([ namespace, "validate" ].join(":"), [ validator ]);
                 if (validator.errors[$field.data("id")]) {
@@ -310,7 +340,15 @@ define(function(require, exports, module) {
                     if (!$.isEmptyObject(validator.errors)) {
                         return false;
                     } else {
-                        $(validator).trigger([ namespace, "afterValidate" ].join(":"), [ validator.form ]);
+                        if(typeof validator.options.extendValidator !== "undefined"){
+                            if(validator.options.extendValidator.call(this)){
+                                $(validator).trigger([ namespace, "afterValidate" ].join(":"), [ validator.form ]);
+                            }else{
+                                return false;
+                            }
+                        }else{
+                            $(validator).trigger([ namespace, "afterValidate" ].join(":"), [ validator.form ]);
+                        }
                     }
                 });
             }
