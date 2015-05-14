@@ -50,12 +50,12 @@ seajs.use('FormValidator', function(FormValidator) {
 	});
 	validator.extendRules({
 		checkMinValue: function(fieldName, value){
-			var idCard = $.trim(value);
-			return idCardValidator.check18IdCard(idCard);
+			var val = $.trim(value);
+			return val == 0 ?true:false;
 		},
 		checkMaxValue: function(fieldName, value){
-			var idCard = $.trim(value);
-			return idCardValidator.checkAge(idCard, 10);
+			var val = $.trim(value);
+			return val == 0 ?true:false;
 		}
 	});
 	//表单验证 初始化
@@ -66,3 +66,5 @@ seajs.use('FormValidator', function(FormValidator) {
 ## Api
 
 Here is some details.
+onSubmit 默认为true, false时只验证不提交表单
+validator.result() 返回整体的验证结果,如果true，可以直接进行ajax或其它操作
