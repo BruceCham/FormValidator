@@ -296,7 +296,11 @@ define(function(require, exports, module) {
             if (!$.isEmptyObject(validator.errors)) {
                 return false;
             } else {
-                return true;
+                if(typeof validator.options.extendValidator !== "undefined"){
+                    return validator.options.extendValidator.call(this);
+                }else{
+                    return true;
+                }
             }
         },
         launched: function() {
