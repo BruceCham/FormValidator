@@ -69,3 +69,4 @@ seajs.use('FormValidator', function(FormValidator) {
 
 ######onSubmit 默认为true, false时只验证不提交表单
 ######validator.result() 返回整体的验证结果,如果true，可以直接进行ajax或其它操作
+######参数extendValidator用于表单验证之外，其它场景的验证，运用于特殊场景，也是true or false，一般场景extendRules可以满足
