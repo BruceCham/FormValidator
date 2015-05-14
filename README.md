@@ -66,5 +66,6 @@ seajs.use('FormValidator', function(FormValidator) {
 ## Api
 
 Here is some details.
-onSubmit 默认为true, false时只验证不提交表单
-validator.result() 返回整体的验证结果,如果true，可以直接进行ajax或其它操作
+
+######onSubmit 默认为true, false时只验证不提交表单
+######validator.result() 返回整体的验证结果,如果true，可以直接进行ajax或其它操作
