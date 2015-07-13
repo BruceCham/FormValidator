@@ -257,6 +257,8 @@ define(function(require, exports, module) {
             // }
             // $div.html("");
             /*for bootstrap html*/
+
+            
             var $div = $field.parent().next("div.help-block");
             if (this.options.wrapper !== null) {
                 $field.closest(this.options.wrapper).removeClass("control-group-error");
@@ -276,6 +278,8 @@ define(function(require, exports, module) {
             //     $field.closest("div.controls").children(":last").after($div);
             // }
             // $div.html(this.errors[$field.data("id")]);
+
+
             /*for bootstrap html*/
             var $div = $field.parent().next("div.help-block");
             if (this.options.wrapper !== null) {
