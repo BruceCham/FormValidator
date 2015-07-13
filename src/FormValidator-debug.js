@@ -36,7 +36,7 @@ define(function(require, exports, module) {
         onKeyup: false,
         onInput: true,
         //默认渲染成功和错误样式的dom
-        wrapper: "div.control-group",
+        // wrapper: "div.control-group",
         success: {},
         fail: {},
         rules: {}
@@ -251,7 +251,13 @@ define(function(require, exports, module) {
         },
         clearError: function($field) {
             $field = $($field);
-            var $div = $field.closest("div.controls").children("div.help-block");
+            // var $div = $field.closest("div.controls").children("div.help-block");
+            // if (this.options.wrapper !== null) {
+            //     $field.closest(this.options.wrapper).removeClass("control-group-error");
+            // }
+            // $div.html("");
+            /*for bootstrap html*/
+            var $div = $field.parent().next("div.help-block");
             if (this.options.wrapper !== null) {
                 $field.closest(this.options.wrapper).removeClass("control-group-error");
             }
@@ -259,7 +265,19 @@ define(function(require, exports, module) {
         },
         renderError: function($field) {
             $field = $($field);
-            var $div = $field.closest("div.controls").children("div.help-block");
+            // var $div = $field.closest("div.controls").children("div.help-block");
+            // if (this.options.wrapper !== null) {
+            //     $field.closest(this.options.wrapper).addClass("control-group-error");
+            // }
+            // if ($div.length === 0) {
+            //     $div = $("<div/>", {
+            //         "class": "help-block"
+            //     });
+            //     $field.closest("div.controls").children(":last").after($div);
+            // }
+            // $div.html(this.errors[$field.data("id")]);
+            /*for bootstrap html*/
+            var $div = $field.parent().next("div.help-block");
             if (this.options.wrapper !== null) {
                 $field.closest(this.options.wrapper).addClass("control-group-error");
             }
@@ -267,7 +285,7 @@ define(function(require, exports, module) {
                 $div = $("<div/>", {
                     "class": "help-block"
                 });
-                $field.closest("div.controls").children(":last").after($div);
+                $field.parent().after($div);
             }
             $div.html(this.errors[$field.data("id")]);
         },
@@ -337,22 +355,23 @@ define(function(require, exports, module) {
                     $form.find('button[type="submit"]').text("正在提交，请稍候");
                 });
                 validator.form.on([ "submit" ].join("."), function(e) {
+                    var vFlag = true;
                     if (!$.isEmptyObject(validator.errors)) {
                         return false;
                     }
                     validator.validate();
                     if (!$.isEmptyObject(validator.errors)) {
                         return false;
-                    } else {
-                        if(typeof validator.options.extendValidator !== "undefined"){
-                            if(validator.options.extendValidator.call(this)){
-                                $(validator).trigger([ namespace, "afterValidate" ].join(":"), [ validator.form ]);
-                            }else{
-                                return false;
-                            }
-                        }else{
+                    }
+                    if(typeof validator.options.extendValidator !== "undefined"){
+                        if(validator.options.extendValidator.call(this)){
                             $(validator).trigger([ namespace, "afterValidate" ].join(":"), [ validator.form ]);
+                        }else{
+                            vFlag = false;
                         }
+                        return vFlag;
+                    }else{
+                        $(validator).trigger([ namespace, "afterValidate" ].join(":"), [ validator.form ]);
                     }
                 });
             }
