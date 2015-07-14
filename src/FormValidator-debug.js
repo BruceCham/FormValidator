@@ -1,42 +1,19 @@
-/*
-//表单验证 引用
-var validator = new FormValidator('#orderForm',{
-    //验证的input框name
-    inputs:["transactionPassword"],
-    //对应的验证规则
-    rules: {
-        transactionPassword: "required|maxlength:6|digit"
-    },
-    //验证的提示信息
-    messages: {
-        transactionPassword:{
-            required: "交易密码不能为空",
-            maxlength : "交易密码为6位数字密码",
-            digit:"交易密码只能是数字"
-        }
-    }
-});
-//表单验证 初始化
-validator.launched();
-
-*/
-
-
-define(function(require, exports, module) {
+define("pafweblib/FormValidator/0.2.1/FormValidator-debug", [ "$-debug" ], function(require, exports, module) {
     "use strict";
     //使用严格模式
-    var namespace = "BChamFormValidator";
+    var $ = require("$-debug"), namespace = "pafweblib.FormValidator";
     var type = [ 'input:not([type]),input[type="color"],input[type="date"],input[type="datetime"],input[type="datetime-local"],input[type="email"],input[type="file"],input[type="hidden"],input[type="month"],input[type="number"],input[type="password"],input[type="range"],input[type="search"],input[type="tel"],input[type="text"],input[type="time"],input[type="url"],input[type="week"],textarea', "select", 'input[type="checkbox"],input[type="radio"]' ], allTypes = type.join(",");
     var defaults = {
-        //默认提交是否验证 false ajax方式提交表单 表单结果从result()取值
+        //预留功能,是否ajax方式提交表单(未实现)
+        isAjax: false,
+        //默认提交是否验证
         onSubmit: true,
         //全局默认onblur时是否验证
         onBlur: true,
         onChange: false,
         onKeyup: false,
-        onInput: true,
         //默认渲染成功和错误样式的dom
-        // wrapper: "div.control-group",
+        wrapper: "div.control-group",
         success: {},
         fail: {},
         rules: {}
@@ -46,20 +23,14 @@ define(function(require, exports, module) {
             return value !== null && $.trim(value).length > 0;
         },
         minlength: function(field, value, min_len, all_rules) {
-            var length = $.trim(value.toString()).length, result = length >= min_len;
+            var length = $.trim(value).length, result = length >= min_len;
             if (!all_rules["required"]) {
                 result = result && length !== 0;
             }
             return result;
         },
         maxlength: function(field, value, max_len) {
-            return $.trim(value.toString()).length <= max_len;
-        },
-        minvalue: function(field, value, min_val){
-            return parseFloat(value) >= parseFloat(min_val);
-        },
-        maxvalue: function(field, value, max_val){
-            return parseFloat(value) <= parseFloat(max_val);
+            return $.trim(value).length <= max_len;
         },
         regex: function(field, value, regexp) {
             return regexp.test(value);
@@ -100,18 +71,9 @@ define(function(require, exports, module) {
             var regex = /^\d*$/;
             return regex.test(value);
         },
-        numeric: function(field, value , point_num) {
-            var point_num = point_num || null;
+        numeric: function(field, value) {
             var regex = /^([\+\-]?[0-9]+(\.[0-9]+)?)?$/;
-            if( regex.test(value) ){
-                if( point_num == null || value.toString().match(/\./) == null){
-                    return true;
-                }else{
-                    return value.toString().split(".")[1].length <= parseInt(point_num);
-                }
-            }else{
-                return false;
-            }
+            return regex.test(value);
         },
         matches: function(field, value, param, all_rules) {
             var length = $.trim(value).length, result = value === this.fields.filter('[data-id="' + param + '"]').val();
@@ -125,11 +87,9 @@ define(function(require, exports, module) {
         required: "输入值不能为空",
         minlength: "输入值不能少于 :value 个字符",
         maxlength: "输入值不能超过 :value 个字符",
-        minvalue: "最小值不能超过value",
-        maxvalue: "最大值不能超过value",
         regex: "请输入正确的值",
-        email: "请输入正确的邮箱格式,如:brucecham@outlook.com",
-        url: "请输入正确的url地址,如:http://www.github.com",
+        email: "请输入正确的邮箱格式,如:pafweblib@pingan.com.cn",
+        url: "请输入正确的url地址,如:http://www.1qianbao.com",
         equals: "输入值必须等于 :value",
         ip: "请输入正确的ip地址格式,如:10.1.1.1",
         phone: "请输入正确的电话号码,如:18688888888",
@@ -145,11 +105,6 @@ define(function(require, exports, module) {
         //public
         this.form = $form;
         this.options = $.extend({}, defaults, options);
-        this.inputs = this.options.inputs;
-        for(var i=0;i<this.inputs.length;i++){
-            this.inputs[i] = "[name=" + this.inputs[i] + "]";
-        }
-        this.inputs = this.inputs.toString();
         this.methods = $.extend({}, methods);
         this.fields = $form.find(allTypes);
         this.allowed_rules = [];
@@ -164,10 +119,9 @@ define(function(require, exports, module) {
     $.extend(Validator.prototype, {
         validate: function() {
             var validator = this;
-            // validator.fields.filter(type[0]).each(function() {
-            validator.fields.filter(validator.inputs).each(function() {
+            validator.fields.filter(type[0]).each(function() {
                 var $field = $(this);
-                $field.trigger([ namespace, "validate" ].join(":"), [ validator ]);
+                $field.trigger([ namespace, "validate" ].join("."), [ validator ]);
                 if (validator.errors[$field.data("id")]) {
                     validator.renderError.call(validator, $(this));
                 } else {
@@ -179,7 +133,7 @@ define(function(require, exports, module) {
         validateField: function(e, validator) {
             var $field = $(this), normalized_rules = {}, field_name = $field.data("id"), value = null;
             // 过滤disabled状态field的逻辑验证
-            if ($field.is(":disabled") || $field.hasClass("disabled")) {
+            if ($field.is(":disabled")) {
                 return;
             }
             //清除控件错误提示
@@ -226,7 +180,7 @@ define(function(require, exports, module) {
                     }
                 }
             }
-            $(validator).trigger([ namespace, "validate" ].join(":"), [ $field, function(error) {
+            $(validator).trigger([ namespace, "validate" ].join("."), [ $field, function(error) {
                 validator.errors[$field.data("id")] = error;
             } ]);
         },
@@ -251,15 +205,7 @@ define(function(require, exports, module) {
         },
         clearError: function($field) {
             $field = $($field);
-            // var $div = $field.closest("div.controls").children("div.help-block");
-            // if (this.options.wrapper !== null) {
-            //     $field.closest(this.options.wrapper).removeClass("control-group-error");
-            // }
-            // $div.html("");
-            /*for bootstrap html*/
-
-            
-            var $div = $field.parent().next("div.help-block");
+            var $div = $field.closest("div.controls").children("div.help-block");
             if (this.options.wrapper !== null) {
                 $field.closest(this.options.wrapper).removeClass("control-group-error");
             }
@@ -267,21 +213,7 @@ define(function(require, exports, module) {
         },
         renderError: function($field) {
             $field = $($field);
-            // var $div = $field.closest("div.controls").children("div.help-block");
-            // if (this.options.wrapper !== null) {
-            //     $field.closest(this.options.wrapper).addClass("control-group-error");
-            // }
-            // if ($div.length === 0) {
-            //     $div = $("<div/>", {
-            //         "class": "help-block"
-            //     });
-            //     $field.closest("div.controls").children(":last").after($div);
-            // }
-            // $div.html(this.errors[$field.data("id")]);
-
-
-            /*for bootstrap html*/
-            var $div = $field.parent().next("div.help-block");
+            var $div = $field.closest("div.controls").children("div.help-block");
             if (this.options.wrapper !== null) {
                 $field.closest(this.options.wrapper).addClass("control-group-error");
             }
@@ -289,7 +221,7 @@ define(function(require, exports, module) {
                 $div = $("<div/>", {
                     "class": "help-block"
                 });
-                $field.parent().after($div);
+                $field.closest("div.controls").children(":last").after($div);
             }
             $div.html(this.errors[$field.data("id")]);
         },
@@ -309,41 +241,24 @@ define(function(require, exports, module) {
                 }
             });
         },
-        result: function(){
-            var validator = this;
-            if (!$.isEmptyObject(validator.errors)) {
-                return false;
-            }
-            validator.validate();
-            if (!$.isEmptyObject(validator.errors)) {
-                return false;
-            } else {
-                if(typeof validator.options.extendValidator !== "undefined"){
-                    return validator.options.extendValidator.call(this);
-                }else{
-                    return true;
-                }
-            }
-        },
         launched: function() {
-            var validator = this, checkOnSubmit = validator.options.onSubmit, checkOnBlur = validator.options.onBlur, checkOnChange = validator.options.onChange, checkOnKeyup = validator.options.onKeyup ,checkOnInput = validator.options.onInput;
+            var validator = this, checkOnSubmit = validator.options.onSubmit, checkOnBlur = validator.options.onBlur, checkOnChange = validator.options.onChange, checkOnKeyup = validator.options.onKeyup;
             validator.parseDom();
             $.each(validator.methods, function(k, v) {
                 validator.allowed_rules.push(k);
             });
             validator.fields.each(function() {
-                $(this).on([ namespace, "validate" ].join(":"), validator.validateField);
+                $(this).on([ namespace, "validate" ].join("."), validator.validateField);
             });
-            if (checkOnBlur || checkOnChange || checkOnKeyup || checkOnInput) {
+            if (checkOnBlur || checkOnChange || checkOnKeyup) {
                 var events = [];
                 if (checkOnBlur) events.push("blur");
                 if (checkOnChange) events.push("change");
                 if (checkOnKeyup) events.push("keyup");
-                if(checkOnInput) events.push("input");
                 validator.fields.filter(type[0]).each(function() {
                     var $field = $(this);
                     $field.on([ events.join(" ") ].join("."), function() {
-                        $field.trigger([ namespace, "validate" ].join(":"), [ validator ]);
+                        $field.trigger([ namespace, "validate" ].join("."), [ validator ]);
                         if (validator.errors[$field.data("id")]) {
                             validator.renderError.call(validator, this);
                         } else {
@@ -359,23 +274,14 @@ define(function(require, exports, module) {
                     $form.find('button[type="submit"]').text("正在提交，请稍候");
                 });
                 validator.form.on([ "submit" ].join("."), function(e) {
-                    var vFlag = true;
                     if (!$.isEmptyObject(validator.errors)) {
                         return false;
                     }
                     validator.validate();
                     if (!$.isEmptyObject(validator.errors)) {
                         return false;
-                    }
-                    if(typeof validator.options.extendValidator !== "undefined"){
-                        if(validator.options.extendValidator.call(this)){
-                            $(validator).trigger([ namespace, "afterValidate" ].join(":"), [ validator.form ]);
-                        }else{
-                            vFlag = false;
-                        }
-                        return vFlag;
-                    }else{
-                        $(validator).trigger([ namespace, "afterValidate" ].join(":"), [ validator.form ]);
+                    } else {
+                        $(validator).trigger([ namespace, "afterValidate" ].join("."), [ validator.form ]);
                     }
                 });
             }
