@@ -311,9 +311,10 @@ define(function(require, exports, module) {
         },
         result: function(){
             var validator = this;
-            if (!$.isEmptyObject(validator.errors)) {
-                return false;
-            }
+            /*修复bug 在组件之外手工清理掉help-block时errors还存在*/
+            // if (!$.isEmptyObject(validator.errors)) {
+            //     return false;
+            // }
             validator.validate();
             if (!$.isEmptyObject(validator.errors)) {
                 return false;
