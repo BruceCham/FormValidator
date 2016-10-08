@@ -81,7 +81,7 @@ define(function(require, exports, module) {
         },
         phone: function(field, value) {
             // 调整 注册支持号段：除 100、110、120外都可支持
-            var regex = /^(1[^012][0-9]{9})$/i;
+            var regex = /^(1[345678][0-9]{9})$/i;
             return regex.test($.trim(value));
         },
         alpha: function(field, value) {
